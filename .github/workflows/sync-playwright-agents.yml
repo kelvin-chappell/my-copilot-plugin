@@ -1,0 +1,46 @@
+name: Sync Playwright agents
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # weekly – picks up new Playwright releases
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install latest Playwright
+        run: npm install --no-save @playwright/test@latest
+
+      - name: Regenerate Playwright Copilot agents
+        run: npx --yes playwright init-agents --loop=copilot
+
+      - name: Collect generated agents into agents/
+        run: node scripts/collect-agents.mjs
+
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(npx --yes playwright --version)" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "playwright-agent-sync"
+          git config user.email "bot@users.noreply.github.com"
+          git add agents/
+          if [ -f .mcp.json ]; then
+            git add .mcp.json
+          fi
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: sync Playwright agents to latest (${{ steps.playwright-version.outputs.version }})"
+            git push
+          fi
