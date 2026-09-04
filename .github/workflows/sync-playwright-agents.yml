@@ -23,8 +23,14 @@ jobs:
       - name: Regenerate Playwright Copilot agents
         run: npx --yes playwright init-agents --loop=copilot
 
+      - name: Generate Playwright agent skills
+        run: npx --yes playwright init-skills --loop=agents
+
       - name: Collect generated agents into agents/
         run: node scripts/collect-agents.mjs
+
+      - name: Collect generated skills into skills/
+        run: node scripts/collect-skills.mjs
 
       - name: Get Playwright version
         id: playwright-version
@@ -35,6 +41,7 @@ jobs:
           git config user.name "playwright-agent-sync"
           git config user.email "bot@users.noreply.github.com"
           git add agents/
+          git add skills/
           if [ -f .mcp.json ]; then
             git add .mcp.json
           fi
