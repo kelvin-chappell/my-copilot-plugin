@@ -1,0 +1,8 @@
+{
+  "$schema": "https://github.com/schemas/copilot-plugin.v1.json",
+  "name": "developer-toolkit",
+  "version": "1.0.0",
+  "description": "Custom agent, code review skills, and database tools for our team.",
+  "author": "Your Name"
+}
+
