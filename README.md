@@ -20,6 +20,20 @@ collects them into `agents/` (via `scripts/collect-agents.mjs`), and commits
 the changes if anything differs. This keeps the bundled agents tracking the
 latest Playwright release without drifting.
 
+The agents' companion skills are generated separately with:
+
+```
+npx playwright init-skills --loop=agents
+```
+
+The `playwright-cli`, `playwright-component-testing`, and `playwright-trace`
+skills are collected into the plugin's top-level `skills/` directory. They
+track the latest Playwright release alongside the agents. These skills are a
+**soft dependency**: the agents still load and run without them, but
+component testing, tracing, and CLI workflows are degraded without the
+additional instructions and references.
+
 To refresh the agents on demand (e.g. right after a new Playwright release),
 trigger the workflow manually from the Actions tab using its
 `workflow_dispatch` trigger, or via `gh workflow run sync-playwright-agents.yml`.
+This refreshes both the agents and their companion skills.
