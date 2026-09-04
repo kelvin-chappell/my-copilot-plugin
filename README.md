@@ -33,6 +33,15 @@ track the latest Playwright release alongside the agents. These skills are a
 component testing, tracing, and CLI workflows are degraded without the
 additional instructions and references.
 
+## Playwright MCP configuration
+
+Generating the agents also produces MCP server configuration (the Playwright
+MCP server). The sync workflow merges that generated config into the plugin's
+root `.mcp.json` via `scripts/collect-mcp.mjs`. The merge is additive and
+idempotent: the hand-written `db-cli` server is always preserved, and only
+Playwright-generated server entries are added or updated. If no generated MCP
+config is found the script logs a warning and leaves `.mcp.json` untouched.
+
 To refresh the agents on demand (e.g. right after a new Playwright release),
 trigger the workflow manually from the Actions tab using its
 `workflow_dispatch` trigger, or via `gh workflow run sync-playwright-agents.yml`.

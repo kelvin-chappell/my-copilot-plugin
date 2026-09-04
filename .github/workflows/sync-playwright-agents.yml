@@ -32,6 +32,9 @@ jobs:
       - name: Collect generated skills into skills/
         run: node scripts/collect-skills.mjs
 
+      - name: Merge generated Playwright MCP config into .mcp.json
+        run: node scripts/collect-mcp.mjs
+
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(npx --yes playwright --version)" >> "$GITHUB_OUTPUT"
