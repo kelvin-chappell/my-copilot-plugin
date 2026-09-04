@@ -36,6 +36,10 @@ function readJson(path) {
   }
 }
 
+function isPlainObject(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function isPlaywrightServer(name, server) {
   if (name.toLowerCase().includes('playwright')) {
     return true;
@@ -45,8 +49,11 @@ function isPlaywrightServer(name, server) {
   return haystack.includes('playwright');
 }
 
-const existingConfig = existsSync(destPath) ? readJson(destPath) ?? {} : {};
-const mergedServers = { ...(existingConfig.mcpServers ?? {}) };
+const parsedConfig = existsSync(destPath) ? readJson(destPath) : null;
+const existingConfig = isPlainObject(parsedConfig) ? parsedConfig : {};
+const mergedServers = isPlainObject(existingConfig.mcpServers)
+  ? { ...existingConfig.mcpServers }
+  : {};
 
 let mergedCount = 0;
 let foundSource = false;
@@ -57,9 +64,9 @@ for (const candidate of CANDIDATE_FILES) {
   }
 
   const config = readJson(candidate);
-  const servers = config?.mcpServers;
+  const servers = isPlainObject(config) ? config.mcpServers : null;
 
-  if (!servers || typeof servers !== 'object') {
+  if (!isPlainObject(servers)) {
     continue;
   }
 
@@ -71,7 +78,6 @@ for (const candidate of CANDIDATE_FILES) {
     // The plugin's own `.mcp.json` is a candidate location, but servers already
     // merged into it are not new generator output.
     if (candidate === destPath) {
-      foundSource = true;
       continue;
     }
 
